@@ -5,7 +5,6 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import Box from '@material-ui/core/Box'
 import IconButton from '@material-ui/core/IconButton'
-import Typography from '@material-ui/core/Typography'
 import makeStyles from '@material-ui/core/styles/makeStyles'
 
 // components
@@ -16,8 +15,11 @@ import UploadButton from '../molecules/UploadButton'
 import UploadPreviewContainer from '../molecules/UploadPreviewContainer'
 
 // redux
-import { useDispatch } from 'react-redux'
-import { uploadAPI } from '../../store/reducers/_Album'
+import { useDispatch, useSelector } from 'react-redux'
+import { uploadAPI, setAlbumState } from '../../store/reducers/_Album'
+
+// lodash
+import find from 'lodash/find'
 
 const useStyles = makeStyles({
   scrollPaper: {
@@ -34,24 +36,83 @@ const useStyles = makeStyles({
 const UploadModal = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const { uploadModalOpen, selectedType, isUploading } = useSelector(state => state.album)
   const [upload, setUpload] = React.useState([])
 
-  const onClick = () => {
-    const formData = new FormData()
-    formData.append('album', 'Personal')
-    upload.forEach(element => {
-      formData.append('documents', element)
+  const closeModal = () => {
+    dispatch(setAlbumState({ state: 'uploadModalOpen', data: false }))
+  }
+
+  /**
+   * Check whether the file is already present
+   * @param {Array} files
+   */
+  const transformData = (files) => {
+    const container = []
+    Array.from(files).forEach(file => {
+      const isPresent = find(upload, { name: file.name })
+      if (isPresent === undefined) {
+        container.push(file)
+      }
     })
-    dispatch(uploadAPI(formData))
+    const newUpload = [...upload, ...container]
+    return newUpload
+  }
+
+  const onClick = async () => {
+    for (let index = 0; index < upload.length; index++) {
+      if (upload[index].isUploaded !== true) {
+        const formData = new FormData()
+        const type = selectedType
+        formData.append('album', type.toLowerCase())
+        formData.append('documents', upload[index])
+        dispatch(setAlbumState({ state: 'uploadKey', data: index })) // update upload key
+        dispatch(setAlbumState({ state: 'uploadProgress', data: 0 })) // update upload progress
+        await uploadAction(formData)
+        upload[index].isUploaded = true // mark the current file uploaded
+      }
+    }
+  }
+
+  const onDrop = (ev) => {
+    ev.preventDefault()
+    const files = ev.dataTransfer.files
+    const x = transformData(files)
+    setUpload(x)
+  }
+
+  const updateUpload = (ev) => {
+    // serialize files
+    const files = ev.target.files
+    const x = transformData(files)
+    setUpload(x)
+  }
+
+  const uploadAction = async (data) => {
+    await dispatch(uploadAPI(data))
+  }
+
+  const buttonUploadDisabled = () => {
+    if (!selectedType) {
+      return true
+    }
+    if (upload.length === 0) {
+      return true
+    }
+    if (isUploading) {
+      return true
+    }
+    return false
   }
 
   return (
     <Dialog
-      open fullWidth disableBackdropClick disableEscapeKeyDown maxWidth='sm'
+      open={uploadModalOpen} fullWidth disableBackdropClick disableEscapeKeyDown maxWidth='sm'
+      onDrop={onDrop} onDragOver={ev => ev.preventDefault()}
       classes={{ scrollPaper: classes.scrollPaper }}
     >
       <Box position='absolute' right={10} top={10}>
-        <IconButton size='small'>
+        <IconButton size='small' onClick={closeModal}>
           <CloseIcon />
         </IconButton>
       </Box>
@@ -59,13 +120,13 @@ const UploadModal = () => {
         Upload Photos
       </DialogTitle>
       <DialogContent>
-        <DragDrop setUpload={setUpload} />
+        <DragDrop setUpload={updateUpload} />
         <Box mb={3} />
         <UploadPreviewContainer files={upload} />
       </DialogContent>
       <DialogActions classes={{ root: classes.actionContainer }}>
         <SelectAlbum />
-        <UploadButton action={onClick} />
+        <UploadButton action={onClick} disabled={buttonUploadDisabled()} />
       </DialogActions>
     </Dialog>
   )

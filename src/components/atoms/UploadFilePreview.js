@@ -8,7 +8,7 @@ const UploadFilePreview = ({ text }) => {
       padding: '6px 8px'
     }}
     >
-      <Typography variant='subtitle2'>{text}</Typography>
+      <Typography variant='subtitle2'><Box fontWeight='bold'>{text}</Box></Typography>
     </Box>
   )
 }

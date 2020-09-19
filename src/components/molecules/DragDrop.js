@@ -25,15 +25,6 @@ const DragDrop = ({ setUpload }) => {
   const onClick = () => {
     inputRef.current.click()
   }
-
-  const onChange = (ev) => {
-    // serialize files
-    const container = []
-    const files = ev.target.files
-    Array.from(files).forEach(file => container.push(file))
-    setUpload(container)
-  }
-
   return (
     <>
       <Box className={classes.container} onClick={onClick}>
@@ -42,7 +33,7 @@ const DragDrop = ({ setUpload }) => {
         </Typography>
       </Box>
       <Box className={classes.inputContainer}>
-        <TextField onChange={onChange} type='file' inputRef={inputRef} inputProps={{ accept: 'image/png, image/jpeg, image/webp', multiple: true }} />
+        <TextField onChange={setUpload} type='file' inputRef={inputRef} inputProps={{ accept: 'image/png, image/jpeg, image/webp', multiple: true }} />
       </Box>
     </>
   )

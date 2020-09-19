@@ -5,9 +5,9 @@ import Typography from '@material-ui/core/Typography'
 
 import UploadIcon from '../atoms/UploadIcon'
 
-const UploadButton = ({ action }) => {
+const UploadButton = ({ action, disabled }) => {
   return (
-    <Button size='small' onClick={action && action}>
+    <Button size='small' onClick={action && action} disabled={disabled}>
       <Box display='flex' alignItems='center'>
         <UploadIcon />
         <Box flexGrow={1} ml={1}>
