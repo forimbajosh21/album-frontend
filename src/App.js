@@ -5,14 +5,20 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import { Provider } from 'react-redux'
 import store from './store/Index'
 
+// Material Ui Theme
+import { ThemeProvider } from '@material-ui/core/styles'
+import theme from './utils/theme'
+
 // pages
 import Home from './pages/Home/Index'
 
 function App () {
   return (
     <Provider store={store}>
-      <CssBaseline />
-      <Home />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Home />
+      </ThemeProvider>
     </Provider>
   )
 }

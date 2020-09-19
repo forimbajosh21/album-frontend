@@ -8,7 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 // components
 import DropdownIcon from '../atoms/DropdownIcon'
 
-const SortMenu = () => {
+const SelectAlbum = () => {
   const [anchorEl, setAnchorEl] = useState(null)
 
   const handleClick = (event) => {
@@ -23,8 +23,8 @@ const SortMenu = () => {
     <>
       <Button size='small' onClick={handleClick}>
         <Box display='flex'>
-          <Box flexGrow={1} mx={1}>
-            <Typography variant='caption'>25</Typography>
+          <Box flexGrow={1}>
+            <Typography variant='subtitle2'>Select Album</Typography>
           </Box>
           <DropdownIcon inverted={Boolean(anchorEl)} />
         </Box>
@@ -45,12 +45,14 @@ const SortMenu = () => {
           horizontal: 'center'
         }}
       >
-        <MenuItem dense onClick={handleClose}>25</MenuItem>
-        <MenuItem dense onClick={handleClose}>50</MenuItem>
-        <MenuItem dense onClick={handleClose}>100</MenuItem>
+        <MenuItem dense onClick={handleClose}>Travel</MenuItem>
+        <MenuItem dense onClick={handleClose}>Personal</MenuItem>
+        <MenuItem dense onClick={handleClose}>Food</MenuItem>
+        <MenuItem dense onClick={handleClose}>Nature</MenuItem>
+        <MenuItem dense onClick={handleClose}>Other</MenuItem>
       </Menu>
     </>
   )
 }
 
-export default SortMenu
+export default SelectAlbum
