@@ -28,7 +28,19 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     margin: 8,
     flex: '0 1 calc(20% - 16px)',
-    borderRadius: 4
+    borderRadius: 4,
+    overflow: 'hidden',
+    [theme.breakpoints.down('md')]: {
+      flex: '0 1 calc(33.3% - 16px)',
+      height: 240
+    },
+    [theme.breakpoints.down('sm')]: {
+      height: 200
+    },
+    [theme.breakpoints.down('xs')]: {
+      flex: '0 1 calc(100% - 16px)',
+      height: 280
+    }
   },
   checkIcon: {
     position: 'absolute',
@@ -55,7 +67,7 @@ const PhotoList = () => {
   const { lists, filter, loadedAll, selectedDelete } = useSelector(state => state.album)
 
   React.useEffect(() => {
-    if (lists.length > 25) {
+    if (lists.length > filter.limit) {
       const lastIndex = lists.length - 1
       const name = `photo-container-${lastIndex}`
       scroller.scrollTo(name, {
@@ -64,7 +76,7 @@ const PhotoList = () => {
         smooth: 'easeInOutQuart'
       })
     }
-  }, [lists])
+  }, [lists, filter.limit])
 
   const loadMore = async (ev) => {
     ev.preventDefault()

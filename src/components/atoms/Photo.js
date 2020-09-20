@@ -7,7 +7,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles'
 import { motion } from 'framer-motion'
 import { Typography } from '@material-ui/core'
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   container: {
     position: 'relative',
     height: '100%',
@@ -18,7 +18,17 @@ const useStyles = makeStyles({
     width: '100%',
     borderRadius: 4,
     backgroundSize: 'auto 100%',
-    backgroundColor: '#E3E3E3'
+    backgroundColor: '#E3E3E3',
+    [theme.breakpoints.down('md')]: {
+      height: 196
+    },
+    [theme.breakpoints.down('sm')]: {
+      height: 166
+    },
+    [theme.breakpoints.down('xs')]: {
+      flex: '0 1 calc(100% - 16px)',
+      height: 246
+    }
   },
   name: {
     fontWeight: 'bold',
@@ -40,13 +50,13 @@ const useStyles = makeStyles({
     background: '#919191',
     zIndex: 1
   }
-})
+}))
 
 const Photo = ({ name, sub, url, overlay }) => {
   const classes = useStyles()
 
   const randomInteger = (min, max) => {
-    return (Math.random() * (2 - 0.1) + 0.1).toFixed(1)
+    return (Math.random() * (1.2 - 0.1) + 0.1).toFixed(1)
   }
 
   return (

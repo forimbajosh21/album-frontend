@@ -22,7 +22,8 @@ export const uploadAPI = createAsyncThunk('album/uploadAPI', async (payloadObj, 
   try {
     const response = await axios.put('/photos', payloadObj, {
       onUploadProgress: (progressEvent) => {
-        dispatch(setAlbumState({ state: 'uploadProgress', data: Math.round((progressEvent.loaded * 100) / progressEvent.total) }))
+        const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+        dispatch(setAlbumState({ state: 'uploadProgress', data: progress }))
       }
     })
     const { message } = response.data

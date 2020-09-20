@@ -6,6 +6,8 @@ import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 import withStyles from '@material-ui/core/styles/withStyles'
+import useTheme from '@material-ui/core/styles/useTheme'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 import findIndex from 'lodash/findIndex'
 
 // redux
@@ -26,6 +28,8 @@ const LightAppBar = withStyles({
 })(AppBar)
 
 const Appbar = () => {
+  const theme = useTheme()
+  const xsDown = useMediaQuery(theme.breakpoints.down('xs'))
   const dispatch = useDispatch()
   const { lists, selectedDelete } = useSelector(state => state.album)
 
@@ -69,18 +73,13 @@ const Appbar = () => {
   return (
     <>
       <LightAppBar elevation={0}>
-        <Container>
+        <Container disableGutters={xsDown}>
           <Toolbar>
             <Box flexGrow={1}>
               <Typography variant='h6'>Photos</Typography>
             </Box>
             <Box display='flex'>
-              {selectedDelete.length > 0 && (
-                <>
-                  <DeleteButton action={deleteButtonAction} />
-                  <Divider flexItem orientation='vertical' variant='middle' />
-                </>
-              )}
+              <DeleteButton action={selectedDelete.length > 0 ? deleteButtonAction : null} />
               <UploadButton action={openModal} />
               <Divider flexItem orientation='vertical' variant='middle' />
               <SortMenu />

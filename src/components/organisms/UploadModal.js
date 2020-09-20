@@ -6,6 +6,10 @@ import DialogActions from '@material-ui/core/DialogActions'
 import Box from '@material-ui/core/Box'
 import IconButton from '@material-ui/core/IconButton'
 import makeStyles from '@material-ui/core/styles/makeStyles'
+import useTheme from '@material-ui/core/styles/useTheme'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
+import Slide from '@material-ui/core/Slide'
+import Fade from '@material-ui/core/Fade'
 
 // components
 import CloseIcon from '../atoms/CloseIcon'
@@ -21,20 +25,33 @@ import { uploadAPI, setAlbumState } from '../../store/reducers/_Album'
 // lodash
 import find from 'lodash/find'
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   scrollPaper: {
     alignItems: 'baseline',
-    marginTop: 50
+    marginTop: 50,
+    [theme.breakpoints.down('xs')]: {
+      marginTop: 'unset'
+    }
   },
   actionContainer: {
     justifyContent: 'space-between',
     paddingLeft: 16,
     paddingRight: 16
   }
+}))
+
+const Transition = React.forwardRef(function Transition (props, ref) {
+  return <Slide direction='up' ref={ref} {...props} />
+})
+
+const TransitionDefault = React.forwardRef(function Transition (props, ref) {
+  return <Fade direction='up' ref={ref} {...props} />
 })
 
 const UploadModal = () => {
   const classes = useStyles()
+  const theme = useTheme()
+  const xsDown = useMediaQuery(theme.breakpoints.down('xs'))
   const dispatch = useDispatch()
   const { uploadModalOpen, selectedType, isUploading } = useSelector(state => state.album)
   const [upload, setUpload] = React.useState([])
@@ -69,7 +86,7 @@ const UploadModal = () => {
         dispatch(setAlbumState({ state: 'uploadKey', data: index })) // update upload key
         dispatch(setAlbumState({ state: 'uploadProgress', data: 0 })) // update upload progress
         await uploadAction(formData)
-        upload[index].isUploaded = true // mark the current file uploaded
+        upload[index].isUploaded = true
       }
     }
   }
@@ -108,11 +125,12 @@ const UploadModal = () => {
   return (
     <Dialog
       open={uploadModalOpen} fullWidth disableBackdropClick disableEscapeKeyDown maxWidth='sm'
+      fullScreen={xsDown} TransitionComponent={xsDown ? Transition : TransitionDefault}
       onDrop={onDrop} onDragOver={ev => ev.preventDefault()}
       classes={{ scrollPaper: classes.scrollPaper }}
     >
       <Box position='absolute' right={10} top={10}>
-        <IconButton size='small' onClick={closeModal}>
+        <IconButton size='small' onClick={closeModal} disabled={isUploading}>
           <CloseIcon />
         </IconButton>
       </Box>
