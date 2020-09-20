@@ -6,14 +6,17 @@ import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 import withStyles from '@material-ui/core/styles/withStyles'
+import findIndex from 'lodash/findIndex'
 
 // redux
-import { useDispatch } from 'react-redux'
-import { setAlbumState } from '../../store/reducers/_Album'
+import { useDispatch, useSelector } from 'react-redux'
+import { setAlbumState, singleDeleteAPI, multipleDeleteAPI } from '../../store/reducers/_Album'
 
 // components
+import DeleteButton from '../molecules/DeleteButton'
 import UploadButton from '../molecules/UploadButton'
 import SortMenu from '../molecules/SortMenu'
+import ConfirmDialog from '../organisms/ConfirmModal'
 
 const LightAppBar = withStyles({
   root: {
@@ -24,10 +27,45 @@ const LightAppBar = withStyles({
 
 const Appbar = () => {
   const dispatch = useDispatch()
+  const { lists, selectedDelete } = useSelector(state => state.album)
 
   const openModal = () => {
     dispatch(setAlbumState({ state: 'uploadModalOpen', data: true }))
   }
+
+  const confirmOkAction = () => {
+    dispatch(setAlbumState({ state: 'confirmModalOpen', data: false }))
+    deleteAction()
+  }
+
+  const confirmCancelAction = () => {
+    dispatch(setAlbumState({ state: 'confirmModalOpen', data: false }))
+  }
+
+  const deleteAction = () => {
+    if (selectedDelete.length > 1) {
+      const x = []
+      selectedDelete.forEach((d, index) => {
+        const y = findIndex(x, { album: lists[d].album }) // get index if present
+        if (y !== -1) {
+          x[y].documents = x[y].documents + ', ' + lists[d].name
+        } else {
+          x.push({ album: lists[d].album, documents: lists[d].name })
+        }
+      })
+      dispatch(multipleDeleteAPI(x))
+    } else {
+      const x = lists[selectedDelete[0]]
+      dispatch(singleDeleteAPI({ album: x.album, name: x.name }))
+    }
+  }
+
+  const deleteButtonAction = () => {
+    dispatch(setAlbumState({ state: 'confirmModalOpen', data: true }))
+  }
+
+  const confirmModalText = 'Are you sure you want to delete ' + selectedDelete.length + ' ' + (selectedDelete.length > 1 ? 'items?' : 'item?')
+
   return (
     <>
       <LightAppBar elevation={0}>
@@ -37,6 +75,12 @@ const Appbar = () => {
               <Typography variant='h6'>Photos</Typography>
             </Box>
             <Box display='flex'>
+              {selectedDelete.length > 0 && (
+                <>
+                  <DeleteButton action={deleteButtonAction} />
+                  <Divider flexItem orientation='vertical' variant='middle' />
+                </>
+              )}
               <UploadButton action={openModal} />
               <Divider flexItem orientation='vertical' variant='middle' />
               <SortMenu />
@@ -45,6 +89,7 @@ const Appbar = () => {
         </Container>
       </LightAppBar>
       <Toolbar />
+      <ConfirmDialog text={confirmModalText} ok={confirmOkAction} cancel={confirmCancelAction} />
     </>
   )
 }

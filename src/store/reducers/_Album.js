@@ -32,6 +32,38 @@ export const uploadAPI = createAsyncThunk('album/uploadAPI', async (payloadObj, 
   }
 })
 
+export const singleDeleteAPI = createAsyncThunk('album/singleDeleteAPI', async (payloadObj, { rejectWithValue, dispatch, getState }) => {
+  try {
+    await axios.delete(`/photos/${payloadObj.album}/${payloadObj.name}`)
+    const { album } = getState()
+    dispatch(photoListAPI(album.filter)) // refetch lists
+  } catch (error) {
+    return rejectWithValue(error.response.data)
+  }
+})
+
+/**
+ * Mutiple Deletion of Photo
+ * @param payloadObj Array[{ album: string, documents: string }]
+ */
+export const multipleDeleteAPI = createAsyncThunk('album/multipleDeleteAPI', async (payloadObj, { rejectWithValue, dispatch, getState }) => {
+  try {
+    await axios({
+      method: 'delete',
+      url: '/photos',
+      data: JSON.stringify(payloadObj),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    const { album } = getState()
+    dispatch(photoListAPI(album.filter)) // refetch lists
+  } catch (error) {
+    console.log(error)
+    return rejectWithValue(error.response.data)
+  }
+})
+
 const slice = createSlice({
   name: 'album',
   initialState: {
@@ -42,11 +74,13 @@ const slice = createSlice({
     lists: [], // List of Photos
     loadedAll: false, // If all photos are already displayed or fetched
     uploadModalOpen: false,
+    confirmModalOpen: false,
     types: ['Travel', 'Personal', 'Food', 'Nature', 'Other'],
     selectedType: '', // selected album type when uploading
     isUploading: false, // upload photo status
     uploadKey: 0, // key of the image being uploaded
-    uploadProgress: 0 // progress of uploaded file
+    uploadProgress: 0, // progress of uploaded file
+    selectedDelete: [] // store index of image to be deleted
   },
   reducers: {
     setAlbumState: (state, action) => {
@@ -69,6 +103,12 @@ const slice = createSlice({
     },
     [uploadAPI.fulfilled]: (state) => {
       state.isUploading = false
+    },
+    [singleDeleteAPI.fulfilled]: (state) => {
+      state.selectedDelete = []
+    },
+    [multipleDeleteAPI.fulfilled]: (state) => {
+      state.selectedDelete = []
     }
   }
 })
