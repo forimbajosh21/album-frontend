@@ -11,19 +11,20 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
 import Fade from '@material-ui/core/Fade'
 
-// components
-import CloseIcon from '../atoms/CloseIcon'
-import DragDrop from '../molecules/DragDrop'
-import SelectAlbum from '../molecules/SelectAlbum'
-import UploadButton from '../molecules/UploadButton'
-import UploadPreviewContainer from '../molecules/UploadPreviewContainer'
-
 // redux
 import { useDispatch, useSelector } from 'react-redux'
 import { uploadAPI, setAlbumState } from '../../store/reducers/_Album'
 
 // lodash
 import find from 'lodash/find'
+
+// components
+import CloseIcon from '../atoms/CloseIcon'
+import DragDrop from '../molecules/DragDrop'
+import SelectAlbum from '../molecules/SelectAlbum'
+import UploadButton from '../molecules/UploadButton'
+import UploadPreviewContainer from '../molecules/UploadPreviewContainer'
+import AlertText from '../atoms/AlertText'
 
 const useStyles = makeStyles((theme) => ({
   scrollPaper: {
@@ -55,6 +56,7 @@ const UploadModal = () => {
   const dispatch = useDispatch()
   const { uploadModalOpen, selectedType, isUploading } = useSelector(state => state.album)
   const [upload, setUpload] = React.useState([])
+  const [errorFileType, setErrorFileType] = React.useState(false)
 
   const closeModal = () => {
     dispatch(setAlbumState({ state: 'uploadModalOpen', data: false }))
@@ -65,7 +67,17 @@ const UploadModal = () => {
    * @param {Array} files
    */
   const transformData = (files) => {
+    const allowedExtension = ['image/png', 'image/jpeg', 'image/webp', 'image/jpg']
     const container = []
+    const fileError = Array.from(files).filter(file => !allowedExtension.includes(file.type))
+    console.log(fileError)
+
+    if (fileError.length > 0) {
+      setErrorFileType(true)
+      return [...upload]
+    } else {
+      setErrorFileType(false)
+    }
     Array.from(files).forEach(file => {
       const isPresent = find(upload, { name: file.name })
       if (isPresent === undefined) {
@@ -138,6 +150,9 @@ const UploadModal = () => {
         Upload Photos
       </DialogTitle>
       <DialogContent>
+        <Box position='relative'>
+          <AlertText text={errorFileType ? 'Image files only.' : null} />
+        </Box>
         <DragDrop setUpload={updateUpload} />
         <Box mb={3} />
         <UploadPreviewContainer files={upload} />

@@ -33,7 +33,7 @@ const DragDrop = ({ setUpload }) => {
         </Typography>
       </Box>
       <Box className={classes.inputContainer}>
-        <TextField onChange={setUpload} type='file' inputRef={inputRef} inputProps={{ accept: 'image/png, image/jpeg, image/webp', multiple: true }} />
+        <TextField onChange={setUpload} type='file' inputRef={inputRef} inputProps={{ accept: 'image/png, image/jpeg, image/webp, image/jpg', multiple: true }} />
       </Box>
     </>
   )
