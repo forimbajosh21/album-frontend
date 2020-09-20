@@ -7,10 +7,9 @@ import axios from '../../utils/axios.config'
 export const photoListAPI = createAsyncThunk('album/photoListAPI', async (payloadObj, { rejectWithValue }) => {
   try {
     const response = await axios.post('/photos/list', payloadObj)
-    const { message, documents } = response.data
-    return { message, documents }
+    const { message, documents, skip } = response.data
+    return { message, documents, skip }
   } catch (error) {
-    console.log(error)
     return rejectWithValue(error.response.data)
   }
 })
@@ -29,7 +28,6 @@ export const uploadAPI = createAsyncThunk('album/uploadAPI', async (payloadObj, 
     const { message } = response.data
     return { message }
   } catch (error) {
-    console.log(error)
     return rejectWithValue(error.response.data)
   }
 })
@@ -42,6 +40,7 @@ const slice = createSlice({
       limit: 25
     },
     lists: [], // List of Photos
+    loadedAll: false, // If all photos are already displayed or fetched
     uploadModalOpen: false,
     types: ['Travel', 'Personal', 'Food', 'Nature', 'Other'],
     selectedType: '', // selected album type when uploading
@@ -56,7 +55,14 @@ const slice = createSlice({
   },
   extraReducers: {
     [photoListAPI.fulfilled]: (state, action) => {
-      state.lists = action.payload.documents
+      if (action.payload.documents.length === 0 || action.payload.documents.length !== state.filter.limit) {
+        state.loadedAll = true
+      }
+      if (action.payload.skip > 0) {
+        state.lists = [...state.lists, ...action.payload.documents]
+      } else {
+        state.lists = action.payload.documents
+      }
     },
     [uploadAPI.pending]: (state) => {
       state.isUploading = true

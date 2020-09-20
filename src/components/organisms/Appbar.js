@@ -5,6 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
+import withStyles from '@material-ui/core/styles/withStyles'
 
 // redux
 import { useDispatch } from 'react-redux'
@@ -14,6 +15,13 @@ import { setAlbumState } from '../../store/reducers/_Album'
 import UploadButton from '../molecules/UploadButton'
 import SortMenu from '../molecules/SortMenu'
 
+const LightAppBar = withStyles({
+  root: {
+    background: '#FFF',
+    color: 'inherit'
+  }
+})(AppBar)
+
 const Appbar = () => {
   const dispatch = useDispatch()
 
@@ -22,7 +30,7 @@ const Appbar = () => {
   }
   return (
     <>
-      <AppBar color='transparent' elevation={0}>
+      <LightAppBar elevation={0}>
         <Container>
           <Toolbar>
             <Box flexGrow={1}>
@@ -35,7 +43,7 @@ const Appbar = () => {
             </Box>
           </Toolbar>
         </Container>
-      </AppBar>
+      </LightAppBar>
       <Toolbar />
     </>
   )

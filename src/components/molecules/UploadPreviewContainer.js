@@ -3,6 +3,7 @@ import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 import makeStyles from '@material-ui/core/styles/makeStyles'
+import { scroller } from 'react-scroll'
 
 // redux
 import { useSelector } from 'react-redux'
@@ -39,6 +40,13 @@ const UploadPreviewContainer = ({ files }) => {
   React.useEffect(() => {
     if (uploadKey > 6) {
       if (containerRef) {
+        const name = `file-preview-${uploadKey}`
+        scroller.scrollTo(name, {
+          duration: 800,
+          delay: 0,
+          smooth: 'easeInOutQuart',
+          containerId: 'preview-container'
+        })
         containerRef.current.children[uploadKey].scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
     }
@@ -52,12 +60,12 @@ const UploadPreviewContainer = ({ files }) => {
     )
   }
   return (
-    <Box className={classes.container} ref={containerRef}>
-      {files.map((image, key) => (
-        <Box key={key} position='relative'>
-          <UploadFilePreview text={image.name} />
+    <Box className={classes.container} ref={containerRef} id='preview-container'>
+      {files.map((image, index) => (
+        <Box key={index} position='relative'>
+          <UploadFilePreview text={image.name} name={index} />
           <Divider />
-          <UploadProgressComponent progress={image.isUploaded ? 100 : uploadKey === key ? uploadProgress : 0} />
+          <UploadProgressComponent progress={image.isUploaded ? 100 : uploadKey === index ? uploadProgress : 0} />
         </Box>
       ))}
     </Box>

@@ -1,5 +1,6 @@
 import React from 'react'
 import Container from '@material-ui/core/Container'
+import Box from '@material-ui/core/Box'
 
 // redux
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,6 +24,7 @@ const Home = () => {
       <Appbar />
       <Container>
         <PhotoList />
+        <Box pb={5} />
       </Container>
       <UploadModal />
     </Container>
